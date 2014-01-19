@@ -1,8 +1,9 @@
 {
-  "name": "turissini.io",
-  "description": "Personal blog",
+  "name": "stateless",
+  "description": "Stateless web server for the server and client",
   "version": "0.0.1",
   "private": true,
+  "main":"./src/stateless.js",
   "dependencies": {
     "pigeon":"git://github.com/davidturissini/pigeon.git",
     "backbone":"1.1.0",
