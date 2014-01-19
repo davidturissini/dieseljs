@@ -4,16 +4,33 @@ var Q = require('q');
 
 
 var port = process.env.PORT || 8888;
+var dieselRoutes = [];
 
-var app = express();
 
-app.get('/', function (req, res) {
-	res.send('foo');
-	res.end();
-
-});
-
-app.listen(port);
 
 
 console.log('Listening on port ' + port);
+
+var diesel = {
+	setRoutes: function (routes) {
+
+		dieselRoutes = routes;
+		return this;
+
+	},
+
+	activate: function () {
+
+		var app = express();
+
+		dieselRoutes.forEach(function (routeData) {
+			app.get(routeData.path, routeData.handler);
+		});
+
+		app.listen(port);
+
+	}
+}
+
+
+module.exports = diesel;
