@@ -53,11 +53,12 @@ stateless
 
 	},{
 
-		path:"/post",
+		path:"/post/:post_id",
 
 		template:staticDir + '/views/foo/index.html',
 		
-		action:function () {
+		action:function (params) {
+			console.log(params);
 			var defer = Q.defer();
 
 			defer.resolve({

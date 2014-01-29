@@ -129,21 +129,30 @@ var backboneServer = {
 
 			router.route(routeData.path.replace('/', ''), '', function () {
 
-				routeData.action().then(function (actionData) {
+				var params = {};
+				routeArgValues = Array.prototype.slice.call(arguments);
+				routeArgProps = routeData.path.match(/:[a-zA-Z_]+/g);
+
+				if (routeArgProps) {
+					routeArgProps.forEach(function (prop, index) {
+						params[prop.replace(':', '')] = routeArgValues[index]; 
+					});
+				}
+
+
+				routeData.action(params).then(function (actionData) {
 
 
 					var layoutPath = layoutsDirectory + '/' + defaultLayoutFileName;
 					
 					server.__loadLayout(layoutPath)
-						.then(function (layoutString) {
-							return server.__loadTemplate(routeData.template);
-						})
+						.then(server.__loadTemplate.bind(server, routeData.template))
 
 						.then(function (templateString) {
 							if (templateString) {
 								window.document.querySelector('.contents').innerHTML = templateString;
 							}
-							
+
 
 							actionData = server.__fillRecursive(actionData, previousData);
 							previousData = actionData;

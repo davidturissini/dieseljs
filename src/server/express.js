@@ -71,7 +71,7 @@ module.exports = {
 
 		routes.forEach(function (routeData) {
 			app.get(routeData.path, function (req, res) {
-				routeData.action().then(function (actionData) {
+				routeData.action(req.params).then(function (actionData) {
 
 					var layoutPath = serverRoot + layoutsDirectory + '/' + defaultLayoutFileName;
 					var doc;
