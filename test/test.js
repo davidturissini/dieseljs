@@ -13,12 +13,13 @@ stateless
 	.setRoutes([{
 
 		path:"/",
+
+		template:staticDir + '/views/home/index.html',
 		
 		action:function () {
 			var defer = Q.defer();
 
 			defer.resolve({
-				template:staticDir + '/views/home/index.html',
 				pageTitle:'pagetitle2',
 				ogTitle:'foo'
 			})
@@ -29,12 +30,13 @@ stateless
 	}, {
 
 		path:"/foo",
+
+		template:staticDir + '/views/foo/index.html',
 		
 		action:function () {
 			var defer = Q.defer();
 
 			defer.resolve({
-				template:staticDir + '/views/foo/index.html',
 				pageTitle:'pagetitlefoo',
 				ogTitle:'fooa',
 				contents:{
@@ -52,18 +54,19 @@ stateless
 	},{
 
 		path:"/post",
+
+		template:staticDir + '/views/foo/index.html',
 		
 		action:function () {
 			var defer = Q.defer();
 
 			defer.resolve({
-				template:staticDir + '/views/foo/index.html',
+				
 				pageTitle:'pagetitlefoo',
 				ogTitle:'fooasd',
 				contents:{
 					post: {
-						title:'post',
-						body:'<a href="/foo">foo</a>'
+						title:'post'
 					}
 				}
 			})

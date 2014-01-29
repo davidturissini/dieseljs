@@ -11,6 +11,8 @@ var viewsDirectory = '/views';
 var defaultLayoutFileName = 'main.html';
 var serverPort = 8888;
 var serverRenderer = require('./../renderer/weld');
+var previousTemplate = '';
+var previousLayout = '';
 
 module.exports = {
 
@@ -38,40 +40,60 @@ module.exports = {
 		routes = routesData;
 	},
 
+	__loadLayout: function (layoutPath) {
+		return pigeon.get(layoutPath);
+	},
+
+	__loadTemplate: function (templatePath) {
+		return pigeon.get(templatePath);
+	},
+
+
+	__createDOM: function (str) {
+		var defer = Q.defer();
+
+		jsdom.env(
+			str,
+
+			[],
+
+			function (errors, window) {
+				defer.resolve(window.document);
+			});
+
+		return defer.promise;
+	},
+
 	activate: function () {
 
 		var app = express();
+		var server = this;
 
 		routes.forEach(function (routeData) {
 			app.get(routeData.path, function (req, res) {
 				routeData.action().then(function (actionData) {
-					var template = actionData.template;
 
-
-					pigeon.get(serverRoot + layoutsDirectory + '/' + defaultLayoutFileName)
+					var layoutPath = serverRoot + layoutsDirectory + '/' + defaultLayoutFileName;
+					var doc;
+					
+					server.__loadLayout(layoutPath)
 						.then(function (data) {
-							var defer = Q.defer();
-							var layoutString = data.toString();
-
-							jsdom.env(
-								layoutString,
-
-								[],
-
-								function (errors, window) {
-									window.document.querySelector('.contents').innerHTML = template;
-									var str = serverRenderer.render(window.document, actionData);
-									defer.resolve(str);
-								});
-
-							return defer.promise;
-							
+							return server.__createDOM(data.toString());
 						})
 
 						.then(function (document) {
-							res.write(document.innerHTML);
-							res.end();
+							doc = document;
+							return server.__loadTemplate(routeData.template);
 						})
+
+						.then(function (templateHTML) {
+							doc.querySelector('.contents').innerHTML = templateHTML;
+							var str = serverRenderer.render(doc, actionData);
+							res.write(doc.innerHTML);
+							res.end();
+						});
+
+
 				});
 				
 			});

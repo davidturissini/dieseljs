@@ -13,7 +13,7 @@ var currentLayoutPath = '';
 var serverRenderer = require('./../renderer/weld');
 var previousTemplate = '';
 var previousLayout = '';
-var lastData = {};
+var previousData = {};
 
 function navigate (router, e) {
 	var behavior = e.currentTarget.getAttribute('data-behavior');
@@ -96,6 +96,31 @@ var backboneServer = {
 		return promise;
 	},
 
+
+	__fillRecursive: function (incoming, outgoing) {
+		for(var x in outgoing) {
+			if (outgoing.hasOwnProperty(x)) {
+
+				if (typeof outgoing[x] === 'object') {
+
+					if (incoming[x] === undefined) {
+						incoming[x] = {};
+					}
+
+					incoming[x] = this.__fillRecursive(incoming[x], outgoing[x]);
+
+				} else if (incoming[x] === undefined) {
+					incoming[x] = '';
+				}
+
+			}
+		}
+
+		return incoming;
+
+	},
+
+
 	activate: function () {
 		var router = new Backbone.Router();
 		var server = this;
@@ -111,16 +136,18 @@ var backboneServer = {
 					
 					server.__loadLayout(layoutPath)
 						.then(function (layoutString) {
-							return server.__loadTemplate(actionData.template);
+							return server.__loadTemplate(routeData.template);
 						})
 
 						.then(function (templateString) {
 							if (templateString) {
-								console.log('ok')
 								window.document.querySelector('.contents').innerHTML = templateString;
 							}
+							
 
-
+							actionData = server.__fillRecursive(actionData, previousData);
+							previousData = actionData;
+							
 							serverRenderer.render(window.document, actionData);
 							
 						});
