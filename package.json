@@ -8,8 +8,14 @@
     "pigeon":"git://github.com/davidturissini/pigeon.git",
     "backbone":"1.1.0",
     "express":"3.4.8",
-    "mustache":"0.8.1",
-    "q":"1.0.0"
+    "dustjs-linkedin":"2.3.1",
+    "q":"1.0.0",
+    "path":"0.4.9",
+    "jquery":"x.x.x",
+    "underscore":"x.x.x",
+    "tls":"x.x.x",
+    "jsdom":"0.8.11",
+    "weld":"0.2.2"
   },
   "engines": {
     "node": "0.8.2",

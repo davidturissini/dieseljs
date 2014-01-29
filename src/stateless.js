@@ -1,36 +1,51 @@
-var express = require('express');
-var Mustache = require('mustache');
 var Q = require('q');
 
+var statelessRoutes = [];
 
-var port = process.env.PORT || 8888;
-var dieselRoutes = [];
-
-
-
-
-console.log('Listening on port ' + port);
-
-var diesel = {
-	setRoutes: function (routes) {
-
-		dieselRoutes = routes;
-		return this;
-
-	},
-
-	activate: function () {
-
-		var app = express();
-
-		dieselRoutes.forEach(function (routeData) {
-			app.get(routeData.path, routeData.handler);
-		});
-
-		app.listen(port);
-
-	}
+var serverDelegate = require('./server/backbone');
+if (process.browser !== true) {
+	serverDelegate = require('./server/' + 'express');
 }
 
 
-module.exports = diesel;
+var stateless = {
+
+	setRenderer: function (renderer) {
+		serverDelegate.setRenderer(renderer);
+		return this;
+	},
+
+	setPort: function (port) {
+		serverDelegate.setPort(port);
+		return this;
+	},
+
+	setLayoutsDirectory: function (layoutsDir) {
+		serverDelegate.setLayoutsDirectory(layoutsDir);
+		return this;
+	},
+
+	setDefaultLayoutFile: function (layoutFile) {
+		serverDelegate.setDefaultLayoutFile(layoutFile);
+		return this;
+	},
+
+	setServerRoot: function (rootDir) {
+		serverDelegate.setServerRoot(rootDir);
+		return this;
+	},
+
+	setRoutes: function (routes) {
+		serverDelegate.setRoutes(routes);
+		return this;
+	},
+
+	activate: function () {
+		serverDelegate.activate();
+		return this;
+	}
+
+}
+
+
+module.exports = stateless;
