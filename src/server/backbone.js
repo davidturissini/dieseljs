@@ -14,6 +14,7 @@ var serverRenderer = require('./../renderer/weld');
 var previousTemplate = '';
 var previousLayout = '';
 var previousData = {};
+var currentRoute;
 
 function navigate (router, e) {
 	var behavior = e.currentTarget.getAttribute('data-behavior');
@@ -158,6 +159,16 @@ var backboneServer = {
 							previousData = actionData;
 							
 							serverRenderer.render(window.document, actionData);
+
+							if (currentRoute && typeof currentRoute.onUnload === 'function') {
+								currentRoute.onUnload();
+							}
+
+							if (typeof routeData.onLoad === 'function') {
+								routeData.onLoad(actionData);
+							}
+
+							currentRoute = routeData;
 							
 						});
 

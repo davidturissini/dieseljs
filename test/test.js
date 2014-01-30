@@ -25,6 +25,14 @@ stateless
 			})
 
 			return defer.promise;
+		},
+
+		onLoad: function () {
+			
+		},
+
+		onUnload: function () {
+
 		}
 
 	}, {
@@ -42,13 +50,21 @@ stateless
 				contents:{
 					post: {
 						title:'foo',
-						body:'<a href="/post">post</a>'
+						body:'<a href="/post/foo">post</a>'
 					}
 				}
 			})
 
 			return defer.promise;
 			
+		},
+
+		onLoad: function () {
+			
+		},
+
+		onUnload: function () {
+			alert('unload')
 		}
 
 	},{
@@ -58,7 +74,6 @@ stateless
 		template:staticDir + '/views/foo/index.html',
 		
 		action:function (params) {
-			console.log(params);
 			var defer = Q.defer();
 
 			defer.resolve({
@@ -74,6 +89,14 @@ stateless
 
 			return defer.promise;
 
+			
+		},
+
+		onLoad: function () {
+			
+		},
+
+		onUnload: function () {
 			
 		}
 
