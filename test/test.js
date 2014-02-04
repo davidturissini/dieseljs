@@ -2,7 +2,6 @@ var stateless = require('./../src/stateless');
 var staticDir = process.browser ? '' : __dirname;
 var Q = require('q');
 var pigeon = require('pigeon');
-var Page = require('./../src/Page');
 
 stateless
 	
