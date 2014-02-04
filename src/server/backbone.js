@@ -10,7 +10,6 @@ var defaultBehavior = 'push';
 var defaultLayoutFileName = 'main.html';
 var pigeon = require('pigeon');
 var currentLayoutPath = '';
-var serverRenderer = require('./../renderer/weld');
 var previousTemplate = '';
 var previousLayout = '';
 var previousData = {};
@@ -43,6 +42,10 @@ function interceptLinks(router) {
 }
 
 var backboneServer = {
+
+	setRenderer: function (renderer) {
+		serverRenderer = renderer;
+	},
 
 	setPort: function () {
 
@@ -141,38 +144,31 @@ var backboneServer = {
 				}
 
 
-				routeData.action(params).then(function (actionData) {
+				var layoutPath = layoutsDirectory + '/' + defaultLayoutFileName;
+				
+				server.__loadLayout(layoutPath)
+					.then(server.__loadTemplate.bind(server, routeData.template))
+
+					.then(function (templateString) {
+						if (templateString) {
+							window.document.querySelector('.contents').innerHTML = templateString;
+						}
 
 
-					var layoutPath = layoutsDirectory + '/' + defaultLayoutFileName;
-					
-					server.__loadLayout(layoutPath)
-						.then(server.__loadTemplate.bind(server, routeData.template))
+						routeData.action(window.document, params);
+						
 
-						.then(function (templateString) {
-							if (templateString) {
-								window.document.querySelector('.contents').innerHTML = templateString;
-							}
+						if (currentRoute && typeof currentRoute.onUnload === 'function') {
+							currentRoute.onUnload();
+						}
 
+						if (typeof routeData.onLoad === 'function') {
+							routeData.onLoad();
+						}
 
-							actionData = server.__fillRecursive(actionData, previousData);
-							previousData = actionData;
-							
-							serverRenderer.render(window.document, actionData);
-
-							if (currentRoute && typeof currentRoute.onUnload === 'function') {
-								currentRoute.onUnload();
-							}
-
-							if (typeof routeData.onLoad === 'function') {
-								routeData.onLoad(actionData);
-							}
-
-							currentRoute = routeData;
-							
-						});
-
-				});
+						currentRoute = routeData;
+						
+					});
 
 			});
 

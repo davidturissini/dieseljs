@@ -2,6 +2,7 @@ var stateless = require('./../src/stateless');
 var staticDir = process.browser ? '' : __dirname;
 var Q = require('q');
 var pigeon = require('pigeon');
+var Page = require('./../src/Page');
 
 stateless
 	
@@ -12,17 +13,39 @@ stateless
 
 	.setRoutes([{
 
-		path:"/",
+		path:'/',
 
 		template:staticDir + '/views/home/index.html',
 		
-		action:function () {
+		action:function (document, routeData) {
 			var defer = Q.defer();
 
-			defer.resolve({
-				pageTitle:'pagetitle2',
-				ogTitle:'foo'
-			})
+			pigeon.get('http://local.traveladdict.me:3000/dave-and-melissa/posts')
+				.then(function (postsData) {
+					var posts = JSON.parse(postsData);
+					var ul = document.querySelector('.posts');
+
+					posts.forEach(function (post) {
+						var href = '/post/' + post.slug;
+
+						var li = document.createElement('li');
+						var a = document.createElement('a');
+						a.setAttribute('href', href);
+						a.innerHTML = post.title;
+
+						li.appendChild(a);
+						ul.appendChild(li);
+
+
+					});
+
+
+
+					defer.resolve();
+
+				});
+
+			
 
 			return defer.promise;
 		},
@@ -33,38 +56,6 @@ stateless
 
 		onUnload: function () {
 
-		}
-
-	}, {
-
-		path:"/foo",
-
-		template:staticDir + '/views/foo/index.html',
-		
-		action:function () {
-			var defer = Q.defer();
-
-			defer.resolve({
-				pageTitle:'pagetitlefoo',
-				ogTitle:'fooa',
-				contents:{
-					post: {
-						title:'foo',
-						body:'<a href="/post/foo">post</a>'
-					}
-				}
-			})
-
-			return defer.promise;
-			
-		},
-
-		onLoad: function () {
-			
-		},
-
-		onUnload: function () {
-			alert('unload')
 		}
 
 	},{
@@ -73,19 +64,24 @@ stateless
 
 		template:staticDir + '/views/foo/index.html',
 		
-		action:function (params) {
+		action:function (document, params) {
 			var defer = Q.defer();
 
-			defer.resolve({
-				
-				pageTitle:'pagetitlefoo',
-				ogTitle:'fooasd',
-				contents:{
-					post: {
-						title:'post'
-					}
-				}
-			})
+			pigeon.get('http://local.traveladdict.me:3000/dave-and-melissa/posts/' + params.post_id)
+				.then(function (postData) {
+					var post = JSON.parse(postData);
+
+					document.title = post.title;
+					
+					document.querySelector('.title').innerHTML = post.title;
+					document.querySelector('.body').innerHTML = post.body;
+
+
+					defer.resolve();
+
+				});
+
+			
 
 			return defer.promise;
 

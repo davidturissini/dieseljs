@@ -10,7 +10,6 @@ var layoutsDirectory = '/layouts';
 var viewsDirectory = '/views';
 var defaultLayoutFileName = 'main.html';
 var serverPort = 8888;
-var serverRenderer = require('./../renderer/weld');
 var previousTemplate = '';
 var previousLayout = '';
 
@@ -71,30 +70,33 @@ module.exports = {
 
 		routes.forEach(function (routeData) {
 			app.get(routeData.path, function (req, res) {
-				routeData.action(req.params).then(function (actionData) {
 
-					var layoutPath = serverRoot + layoutsDirectory + '/' + defaultLayoutFileName;
-					var doc;
-					
-					server.__loadLayout(layoutPath)
-						.then(function (data) {
-							return server.__createDOM(data.toString());
-						})
+				var layoutPath = serverRoot + layoutsDirectory + '/' + defaultLayoutFileName;
+				var doc;
+				
+				server.__loadLayout(layoutPath)
 
-						.then(function (document) {
-							doc = document;
-							return server.__loadTemplate(routeData.template);
-						})
+					.then(function (data) {
+						return server.__createDOM(data.toString());
+					})
 
-						.then(function (templateHTML) {
-							doc.querySelector('.contents').innerHTML = templateHTML;
-							var str = serverRenderer.render(doc, actionData);
-							res.write(doc.innerHTML);
-							res.end();
-						});
+					.then(function (document) {
+						doc = document;
+						return server.__loadTemplate(routeData.template);
+					})
+
+					.then(function (templateHTML) {
+						doc.querySelector('.contents').innerHTML = templateHTML;
+						return routeData.action(doc, req.params);
+					})
+
+					.then(function () {
+						res.write(doc.innerHTML);
+						res.end();
+					})
 
 
-				});
+				
 				
 			});
 		});

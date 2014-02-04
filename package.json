@@ -15,7 +15,8 @@
     "underscore":"x.x.x",
     "tls":"x.x.x",
     "jsdom":"0.8.11",
-    "weld":"0.2.2"
+    "transparency":"0.9.14",
+    "soma-template":"0.2.7"
   },
   "engines": {
     "node": "0.8.2",
