@@ -86,7 +86,7 @@ module.exports = {
 					})
 
 					.then(function (templateHTML) {
-						doc.querySelector('.contents').innerHTML = templateHTML;
+						doc.querySelector('.content').innerHTML = templateHTML;
 						return routeData.action(doc, req.params);
 					})
 

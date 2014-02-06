@@ -128,10 +128,16 @@ var backboneServer = {
 	activate: function () {
 		var router = new Backbone.Router();
 		var server = this;
+		var htmlEl = jquery('html');
+		var contentEl = jquery('.content');
 
 		routes.reverse().forEach(function (routeData) {
 
 			router.route(routeData.path.replace('/', ''), '', function () {
+				if (htmlEl.hasClass('loading') === false) {
+					contentEl.removeClass('dynamic');
+					htmlEl.addClass('loading');
+				}
 
 				var params = {};
 				routeArgValues = Array.prototype.slice.call(arguments);
@@ -151,7 +157,7 @@ var backboneServer = {
 
 					.then(function (templateString) {
 						if (templateString) {
-							window.document.querySelector('.contents').innerHTML = templateString;
+							contentEl.html(templateString);
 						}
 
 
@@ -162,11 +168,18 @@ var backboneServer = {
 								}
 
 								if (typeof routeData.onLoad === 'function') {
-									routeData.onLoad(data);
+									return routeData.onLoad(data);
 								}
+								
+							})
 
+							.then(function () {
+								if (htmlEl.hasClass('loading') === true) {
+									contentEl.addClass('dynamic');
+									htmlEl.removeClass('loading');
+								}
 								currentRoute = routeData;
-							});
+							})
 						
 					});
 
