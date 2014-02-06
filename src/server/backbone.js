@@ -155,18 +155,18 @@ var backboneServer = {
 						}
 
 
-						routeData.action(window.document, params);
-						
+						routeData.action(window.document, params)
+							.then(function (data) {
+								if (currentRoute && typeof currentRoute.onUnload === 'function') {
+									currentRoute.onUnload();
+								}
 
-						if (currentRoute && typeof currentRoute.onUnload === 'function') {
-							currentRoute.onUnload();
-						}
+								if (typeof routeData.onLoad === 'function') {
+									routeData.onLoad(data);
+								}
 
-						if (typeof routeData.onLoad === 'function') {
-							routeData.onLoad();
-						}
-
-						currentRoute = routeData;
+								currentRoute = routeData;
+							});
 						
 					});
 

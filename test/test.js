@@ -2,6 +2,7 @@ var stateless = require('./../src/stateless');
 var staticDir = process.browser ? '' : __dirname;
 var Q = require('q');
 var pigeon = require('pigeon');
+var transparency = require('transparency');
 
 stateless
 	
@@ -17,36 +18,24 @@ stateless
 		template:staticDir + '/views/home/index.html',
 		
 		action:function (document, routeData) {
-			var defer = Q.defer();
 
-			pigeon.get('http://local.traveladdict.me:3000/dave-and-melissa/posts')
+			return pigeon.get('http://local.traveladdict.me:3000/dave-and-melissa/posts')
 				.then(function (postsData) {
 					var posts = JSON.parse(postsData);
 					var ul = document.querySelector('.posts');
-
+					var li = ul.querySelector('.post');
+					ul.removeChild(li);
+					
 					posts.forEach(function (post) {
-						var href = '/post/' + post.slug;
+						var clone = li.cloneNode(true);
+						transparency.render(clone, post);
 
-						var li = document.createElement('li');
-						var a = document.createElement('a');
-						a.setAttribute('href', href);
-						a.innerHTML = post.title;
-
-						li.appendChild(a);
-						ul.appendChild(li);
-
+						ul.appendChild(clone);
 
 					});
 
-
-
-					defer.resolve();
-
 				});
 
-			
-
-			return defer.promise;
 		},
 
 		onLoad: function () {
