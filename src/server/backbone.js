@@ -14,6 +14,8 @@ var previousTemplate = '';
 var previousLayout = '';
 var previousData = {};
 var currentRoute;
+var bodyEl;
+var contentEl;
 
 function navigate (router, e) {
 	var behavior = e.currentTarget.getAttribute('data-behavior');
@@ -40,6 +42,68 @@ function interceptLinks(router) {
 	var boundNavigate = navigate.bind(undefined, router);
 	jquery(document).on('click', 'a:not([href^=http]):not([data-router="ignore"])', boundNavigate);
 }
+
+
+function parseRouteArguments (path, routeArgs) {
+	var params = {};
+	var routeArgProps = path.match(/:[a-zA-Z_]+/g);
+
+	if (routeArgProps) {
+		routeArgProps.forEach(function (prop, index) {
+			params[prop.replace(':', '')] = routeArgs[index]; 
+		});
+	}
+
+	return params;
+}
+
+
+function renderHTML (params, htmlString) {
+	if (htmlString) {
+		contentEl.html(htmlString);
+	}
+
+
+	this.action(window.document, params)
+		.then(function (data) {
+			
+			if (currentRoute && typeof currentRoute.onUnload === 'function') {
+				currentRoute.onUnload();
+			}
+
+			if (typeof this.onLoad === 'function') {
+				return this.onLoad(data);
+			}
+			
+		}.bind(this))
+
+		.then(function () {
+			if (bodyEl.hasClass('loading') === true) {
+				bodyEl.removeClass('loading');
+			}
+
+			currentRoute = routeData;
+
+		}.bind(this))
+}
+
+
+function onRouteChange () {
+
+	if (bodyEl.hasClass('loading') === false) {
+		bodyEl.addClass('loading');
+	}
+	
+	var params = parseRouteArguments(this.path, Array.prototype.slice.call(arguments));
+
+	var layoutPath = layoutsDirectory + '/' + defaultLayoutFileName;
+	
+	backboneServer.__loadLayout(layoutPath)
+		.then(backboneServer.__loadTemplate.bind(backboneServer, this.template))
+		.then(renderHTML.bind(this, params));
+
+};
+
 
 var backboneServer = {
 
@@ -128,61 +192,13 @@ var backboneServer = {
 	activate: function () {
 		var router = new Backbone.Router();
 		var server = this;
-		var bodyEl = jquery('body');
-		var contentEl = jquery('.content');
+
+		bodyEl = jquery('body');
+		contentEl = jquery('.content');
+		
 		
 		routes.reverse().forEach(function (routeData) {
-
-			router.route(routeData.path.replace('/', ''), '', function () {
-				if (bodyEl.hasClass('loading') === false) {
-					bodyEl.addClass('loading');
-				}
-
-				var params = {};
-				routeArgValues = Array.prototype.slice.call(arguments);
-				routeArgProps = routeData.path.match(/:[a-zA-Z_]+/g);
-
-				if (routeArgProps) {
-					routeArgProps.forEach(function (prop, index) {
-						params[prop.replace(':', '')] = routeArgValues[index]; 
-					});
-				}
-
-
-				var layoutPath = layoutsDirectory + '/' + defaultLayoutFileName;
-				
-				server.__loadLayout(layoutPath)
-					.then(server.__loadTemplate.bind(server, routeData.template))
-
-					.then(function (templateString) {
-						if (templateString) {
-							contentEl.html(templateString);
-						}
-
-
-						routeData.action(window.document, params)
-							.then(function (data) {
-								if (currentRoute && typeof currentRoute.onUnload === 'function') {
-									currentRoute.onUnload();
-								}
-
-								if (typeof routeData.onLoad === 'function') {
-									return routeData.onLoad(data);
-								}
-								
-							})
-
-							.then(function () {
-								if (bodyEl.hasClass('loading') === true) {
-									bodyEl.removeClass('loading');
-								}
-								currentRoute = routeData;
-							})
-						
-					});
-
-			});
-
+			router.route(routeData.path.replace('/', ''), '', onRouteChange.bind(routeData));
 		});
 
 		interceptLinks(router);
