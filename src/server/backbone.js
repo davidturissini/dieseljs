@@ -39,7 +39,7 @@ function navigate (router, e) {
 
 function interceptLinks(router) {
 	var boundNavigate = navigate.bind(undefined, router);
-	jquery(document).on('click', 'a:not([href^=http]), a:not([data-router="ignore"])', boundNavigate);
+	jquery(document).on('click', 'a:not([href^=http]):not([data-router="ignore"])', boundNavigate);
 }
 
 var backboneServer = {
