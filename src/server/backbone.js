@@ -3,6 +3,7 @@ var _ = require('underscore');
 var jquery = require('jquery');
 var Q = require('q');
 Backbone.$ = jquery;
+var isMobile = require('./../util/isMobile');
 
 var routes = [];
 var layoutsDirectory = '/layouts';
@@ -131,6 +132,10 @@ var backboneServer = {
 		var htmlEl = jquery('html');
 		var contentEl = jquery('.content');
 
+		if (isMobile) {
+			return;
+		}
+		
 		routes.reverse().forEach(function (routeData) {
 
 			router.route(routeData.path.replace('/', ''), '', function () {
