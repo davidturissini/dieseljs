@@ -10,6 +10,11 @@ if (process.browser !== true) {
 
 var stateless = {
 
+	setAnalytics: function (analytics) {
+		serverDelegate.setAnalytics(analytics);
+		return this;
+	},
+
 	setRenderer: function (renderer) {
 		serverDelegate.setRenderer(renderer);
 		return this;

@@ -15,6 +15,10 @@ var previousLayout = '';
 
 module.exports = {
 
+	setAnalytics: function (a) {
+		return this;
+	},
+
 	setRenderer: function (renderer) {
 		serverRenderer = renderer;
 	},

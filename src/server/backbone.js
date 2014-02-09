@@ -16,6 +16,7 @@ var previousData = {};
 var currentRoute;
 var bodyEl;
 var contentEl;
+var analytics;
 
 function navigate (router, e) {
 	var behavior = e.currentTarget.getAttribute('data-behavior');
@@ -81,6 +82,10 @@ function renderHTML (params, htmlString) {
 			if (bodyEl.hasClass('loading') === true) {
 				bodyEl.removeClass('loading');
 			}
+			
+			if (analytics && analytics.track && typeof analytics.track === 'function') {
+				analytics.track(window.location.pathname);
+			}
 
 			currentRoute = routeData;
 
@@ -106,6 +111,10 @@ function onRouteChange () {
 
 
 var backboneServer = {
+
+	setAnalytics: function (analyticsDelegate) {
+		analytics = analyticsDelegate;
+	},
 
 	setRenderer: function (renderer) {
 		serverRenderer = renderer;
