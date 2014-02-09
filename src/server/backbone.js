@@ -135,7 +135,6 @@ var backboneServer = {
 
 			router.route(routeData.path.replace('/', ''), '', function () {
 				if (htmlEl.hasClass('loading') === false) {
-					contentEl.removeClass('dynamic');
 					htmlEl.addClass('loading');
 				}
 
@@ -175,7 +174,6 @@ var backboneServer = {
 
 							.then(function () {
 								if (htmlEl.hasClass('loading') === true) {
-									contentEl.addClass('dynamic');
 									htmlEl.removeClass('loading');
 								}
 								currentRoute = routeData;
