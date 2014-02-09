@@ -128,14 +128,14 @@ var backboneServer = {
 	activate: function () {
 		var router = new Backbone.Router();
 		var server = this;
-		var htmlEl = jquery('html');
+		var bodyEl = jquery('body');
 		var contentEl = jquery('.content');
 		
 		routes.reverse().forEach(function (routeData) {
 
 			router.route(routeData.path.replace('/', ''), '', function () {
-				if (htmlEl.hasClass('loading') === false) {
-					htmlEl.addClass('loading');
+				if (bodyEl.hasClass('loading') === false) {
+					bodyEl.addClass('loading');
 				}
 
 				var params = {};
@@ -173,8 +173,8 @@ var backboneServer = {
 							})
 
 							.then(function () {
-								if (htmlEl.hasClass('loading') === true) {
-									htmlEl.removeClass('loading');
+								if (bodyEl.hasClass('loading') === true) {
+									bodyEl.removeClass('loading');
 								}
 								currentRoute = routeData;
 							})
