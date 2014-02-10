@@ -10,13 +10,13 @@ var defaultBehavior = 'push';
 var defaultLayoutFileName = 'main.html';
 var pigeon = require('pigeon');
 var currentLayoutPath = '';
-var previousTemplate = '';
 var previousLayout = '';
 var previousData = {};
 var currentRoute;
 var bodyEl;
 var contentEl;
 var analytics;
+var templateCache = {};
 
 function navigate (router, e) {
 	var behavior = e.currentTarget.getAttribute('data-behavior');
@@ -59,10 +59,9 @@ function parseRouteArguments (path, routeArgs) {
 }
 
 
-function renderHTML (params, htmlString) {
-	if (htmlString) {
-		contentEl.html(htmlString);
-	}
+function renderHTML (params, documentFragment) {
+	contentEl.innerHTML = '';
+	contentEl.appendChild(documentFragment);
 
 
 	this.action(window.document, params)
@@ -98,6 +97,7 @@ function onRouteChange () {
 	if (bodyEl.hasClass('loading') === false) {
 		bodyEl.addClass('loading');
 	}
+	window.scrollTo(0, 0);
 	
 	var params = parseRouteArguments(this.path, Array.prototype.slice.call(arguments));
 
@@ -162,10 +162,28 @@ var backboneServer = {
 		var defer = Q.defer();
 		var promise = defer.promise;
 
-		if (previousTemplate !== templatePath) {
-			promise = pigeon.get(templatePath);
+		if (templateCache[templatePath] === undefined) {
+			promise = pigeon.get(templatePath)
+				.then(function (responseHTML) {
+					var parser = new DOMParser();
+					var parsedContents = parser.parseFromString(responseHTML, 'text/html');
+					var fragment = new DocumentFragment();
+					var children = Array.prototype.slice.call(parsedContents.body.children);
+
+					for(var i = 0; i < children.length; i += 1) {
+						fragment.appendChild(children[i]);
+					}
+
+					templateCache[templatePath] = fragment.cloneNode(true);
+
+					return fragment;
+
+				});
+
 		} else {
-			defer.resolve();
+
+			defer.resolve(templateCache[templatePath].cloneNode(true));
+
 		}
 
 		previousTemplate = templatePath;
@@ -200,10 +218,9 @@ var backboneServer = {
 
 	activate: function () {
 		var router = new Backbone.Router();
-		var server = this;
 
 		bodyEl = jquery('body');
-		contentEl = jquery('.content');
+		contentEl = document.querySelector('.content');
 		
 		
 		routes.reverse().forEach(function (routeData) {
