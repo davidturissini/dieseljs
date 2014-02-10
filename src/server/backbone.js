@@ -167,7 +167,7 @@ var backboneServer = {
 				.then(function (responseHTML) {
 					var parser = new DOMParser();
 					var parsedContents = parser.parseFromString(responseHTML, 'text/html');
-					var fragment = new DocumentFragment();
+					var fragment = document.createDocumentFragment();
 					var children = Array.prototype.slice.call(parsedContents.body.children);
 
 					for(var i = 0; i < children.length; i += 1) {
