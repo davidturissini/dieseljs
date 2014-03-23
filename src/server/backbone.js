@@ -89,6 +89,10 @@ function renderHTML (params, documentFragment) {
 			currentRoute = routeData;
 
 		}.bind(this))
+
+		.fail(function (error) {
+			console.error(error.stack);
+		});
 }
 
 
