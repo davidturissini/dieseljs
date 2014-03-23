@@ -86,8 +86,6 @@ function renderHTML (params, documentFragment) {
 				analytics.track(window.location.pathname);
 			}
 
-			currentRoute = routeData;
-
 		}.bind(this))
 
 		.fail(function (error) {
